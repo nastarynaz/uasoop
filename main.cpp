@@ -26,6 +26,7 @@ void showMenu() {
     std::cout << "[5] Buat Reservasi" << std::endl;
     std::cout << "[6] Lihat Daftar Reservasi" << std::endl;
     std::cout << "[7] Batalkan Reservasi" << std::endl;
+    std::cout << "[8] Konfirmasi Pembayaran" << std::endl;
     std::cout << "[0] Keluar" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "Pilihan Anda: ";
@@ -225,6 +226,56 @@ void cancelReservationMenu(Hotel& hotel) {
     }
 }
 
+void confirmPaymentMenu(Hotel& hotel) {
+    int resId;
+    
+    std::cout << "\n+--------------------------------------+" << std::endl;
+    std::cout << "|       KONFIRMASI PEMBAYARAN          |" << std::endl;
+    std::cout << "+--------------------------------------+" << std::endl;
+    
+    // Tampilkan daftar reservasi yang ada
+    hotel.showReservationList();
+    
+    std::cout << "\nMasukkan ID Reservasi untuk konfirmasi pembayaran: ";
+    std::cin >> resId;
+    
+    Reservation* res = hotel.getReservationById(resId);
+    if (res == NULL) {
+        std::cout << "Error: Reservasi tidak ditemukan!" << std::endl;
+        return;
+    }
+    
+    Payment* payment = res->getPayment();
+    if (payment == NULL) {
+        std::cout << "Error: Data pembayaran tidak ditemukan!" << std::endl;
+        return;
+    }
+    
+    std::cout << "\n--- Detail Pembayaran ---" << std::endl;
+    std::cout << "ID Reservasi: " << res->idReservation << std::endl;
+    std::cout << "Customer    : " << res->customer->name << std::endl;
+    std::cout << "Kamar       : " << res->room->roomType << " (#" << res->room->idRoom << ")" << std::endl;
+    std::cout << "Total Bayar : Rp " << payment->totalAmount << std::endl;
+    std::cout << "Status      : " << payment->paymentStatus << std::endl;
+    
+    if (payment->paymentStatus == "Confirmed") {
+        std::cout << "\n>> Pembayaran sudah dikonfirmasi sebelumnya." << std::endl;
+        return;
+    }
+    
+    std::cout << "\nKonfirmasi pembayaran? [1] Ya  [2] Tidak" << std::endl;
+    std::cout << "Pilihan: ";
+    
+    int confirm;
+    std::cin >> confirm;
+    
+    if (confirm == 1) {
+        payment->confirmPayment();
+    } else {
+        std::cout << "Konfirmasi dibatalkan." << std::endl;
+    }
+}
+
 int main() {
     Hotel myHotel("UGM Hotel", "Yogyakarta");
     int choice;
@@ -265,6 +316,9 @@ int main() {
             case 7:
                 cancelReservationMenu(myHotel);
                 break;
+            case 8:
+                confirmPaymentMenu(myHotel);
+                break;
             case 0:
                 std::cout << "\n========================================" << std::endl;
                 std::cout << "  Terima kasih telah menggunakan sistem" << std::endl;
@@ -272,7 +326,7 @@ int main() {
                 std::cout << "========================================" << std::endl;
                 break;
             default:
-                std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-7." << std::endl;
+                std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-8." << std::endl;
         }
     } while (choice != 0);
     

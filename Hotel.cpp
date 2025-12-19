@@ -41,3 +41,10 @@ Room* Hotel::getRoomById(int id) {
     for (size_t i = 0; i < roomList.size(); ++i) { if (roomList[i]->idRoom == id) return roomList[i]; }
     return NULL;
 }
+
+Reservation* Hotel::getReservationById(int id) {
+    for (size_t i = 0; i < reservationList.size(); ++i) {
+        if (reservationList[i]->idReservation == id) return reservationList[i];
+    }
+    return NULL;
+}

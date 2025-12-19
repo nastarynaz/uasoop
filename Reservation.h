@@ -3,14 +3,7 @@
 #include <string>
 #include "Customer.h"
 #include "Room.h"
-
-class Payment {
-public:
-    int idPayment;
-    double totalAmount;
-    std::string paymentStatus;
-    Payment(int id, double amount) : idPayment(id), totalAmount(amount), paymentStatus("Pending") {}
-};
+#include "Payment.h"
 
 class Reservation {
 public:
@@ -25,5 +18,8 @@ public:
     ~Reservation();
     void showReservationDetails();
     void cancelReservation();
+    
+    // Getter untuk Payment
+    Payment* getPayment() { return payment; }
 };
 #endif

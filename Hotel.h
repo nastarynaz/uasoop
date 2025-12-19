@@ -20,5 +20,6 @@ public:
     void createReservation(Customer* c, Room* r, std::string in, std::string out);
     void cancelReservationById(int id);
     Room* getRoomById(int id);
+    Reservation* getReservationById(int id);  // Method baru untuk akses reservasi
 };
 #endif
