@@ -15,11 +15,12 @@
 
 ---
 
-## � Deskripsi
+## 📋 Deskripsi
 
 **Hotel Management System** adalah aplikasi berbasis CLI yang dirancang untuk mengelola operasional hotel secara efisien. Program ini mengimplementasikan konsep OOP secara lengkap termasuk **Encapsulation**, **Inheritance**, **Polymorphism**, dan **Design Pattern (Factory Pattern)**.
 
 ### ✨ Highlight
+- 🔐 Sistem login dengan 2 role (Admin & Tamu)
 - 🏠 Manajemen kamar dengan 3 tipe (Deluxe, Superior, Suite)
 - 👥 Registrasi dan pengelolaan data customer
 - 📅 Sistem reservasi lengkap dengan tanggal check-in/check-out
@@ -28,18 +29,40 @@
 
 ---
 
-## 🚀 Fitur
+## � Sistem Login
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| **Tambah Kamar** | Menambah kamar baru dengan ID otomatis (Deluxe/Superior/Suite) |
-| **Lihat Kamar** | Menampilkan semua kamar dengan status (Available/Booked) |
-| **Tambah Customer** | Registrasi customer baru dengan nama, email, dan telepon |
-| **Lihat Customer** | Daftar semua customer yang terdaftar |
-| **Buat Reservasi** | Membuat reservasi dengan memilih customer dan kamar |
-| **Lihat Reservasi** | Menampilkan reservasi aktif dengan status pembayaran |
-| **Batalkan Reservasi** | Membatalkan reservasi dan mengembalikan status kamar |
-| **Konfirmasi Pembayaran** | Mengkonfirmasi pembayaran untuk reservasi |
+Program memiliki 2 role pengguna dengan akses berbeda:
+
+### 👨‍💼 Admin
+Akses penuh ke semua fitur sistem.
+
+| Menu | Fungsi |
+|------|--------|
+| [1] Tambah Kamar Baru | Menambah kamar dengan tipe Deluxe/Superior/Suite |
+| [2] Lihat Daftar Kamar | Melihat semua kamar |
+| [3] Cek Ketersediaan Kamar | Cek apakah kamar tersedia pada tanggal tertentu |
+| [4] Tambah Customer Baru | Registrasi customer dengan nama, email, telepon |
+| [5] Lihat Daftar Customer | Melihat semua customer terdaftar |
+| [6] Buat Reservasi | Membuat reservasi baru |
+| [7] Lihat Daftar Reservasi | Melihat semua reservasi aktif |
+| [8] Batalkan Reservasi | Membatalkan reservasi yang ada |
+| [9] Konfirmasi Pembayaran | Mengkonfirmasi pembayaran reservasi |
+| [10] Logout | Kembali ke menu login |
+| [0] Keluar | Keluar dari program |
+
+### 👤 Tamu
+Akses terbatas untuk melakukan reservasi.
+
+| Menu | Fungsi |
+|------|--------|
+| [1] Lihat Daftar Kamar | Melihat kamar yang tersedia |
+| [2] Cek Ketersediaan Kamar | Cek apakah kamar tersedia pada tanggal tertentu |
+| [3] Daftar Sebagai Customer | Registrasi sebagai customer baru |
+| [4] Buat Reservasi | Membuat reservasi kamar |
+| [5] Lihat Reservasi Saya | Melihat daftar reservasi |
+| [6] Batalkan Reservasi | Membatalkan reservasi sendiri |
+| [9] Logout | Kembali ke menu login |
+| [0] Keluar | Keluar dari program |
 
 ---
 
@@ -58,7 +81,7 @@
 ```
 Tugas_OOP_Hotel/
 │
-├── 📄 main.cpp              # Entry point & menu interaktif
+├── 📄 main.cpp              # Entry point, menu login, & menu interaktif
 │
 ├── 🏨 Hotel.h / Hotel.cpp   # Class Hotel (agregator utama)
 │
@@ -80,6 +103,8 @@ Tugas_OOP_Hotel/
 
 ## 🏗️ Class Diagram
 
+### Diagram Utama
+
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                             HOTEL                                 │
@@ -89,6 +114,8 @@ Tugas_OOP_Hotel/
 │ + hotelName: string                                               │
 │ + hotelAddress: string                                            │
 ├──────────────────────────────────────────────────────────────────┤
+│ + Hotel(name, addr)                                               │
+│ + addRoom(Room*)                                                  │
 │ + showRoomList()                                                  │
 │ + showReservationList()                                           │
 │ + createReservation(Customer*, Room*, string, string)             │
@@ -96,7 +123,7 @@ Tugas_OOP_Hotel/
 │ + getRoomById(int): Room*                                         │
 │ + getReservationById(int): Reservation*                           │
 └────────────────────┬─────────────────────┬───────────────────────┘
-                     │ has 0..*            │ 1
+                     │ aggregation 0..*    │ association 1
                      ▼                     ▼
 ┌─────────────────────────┐     ┌─────────────────────────────────┐
 │          ROOM           │     │           CUSTOMER              │
@@ -106,25 +133,29 @@ Tugas_OOP_Hotel/
 │ + price: double         │     │ + email: string                 │
 │ + status: string        │     │ + phoneNumber: string           │
 │ + capacity: int         │     ├─────────────────────────────────┤
-├─────────────────────────┤     │ + showCustomerDetails()         │
-│ + showRoomDetails()     │     │ + bookRoom(Room*)               │
-│ + changeRoomStatus()    │     └────────────────┬────────────────┘
-└───────────┬─────────────┘                      │ makes 0..*
-            │                                    ▼
-            │ contains 1          ┌─────────────────────────────────┐
-            │                     │         RESERVATION             │
+├─────────────────────────┤     │ + Customer(id, name, email, phone) │
+│ + Room(id, type, p, cap)│     │ + showCustomerDetails()         │
+│ + virtual ~Room()       │     │ + bookRoom(Room*)               │
+│ + showRoomDetails()     │     └────────────────┬────────────────┘
+│ + changeRoomStatus()    │                      │ makes 0..*
+└───────────┬─────────────┘                      ▼
+            │                     ┌─────────────────────────────────┐
+            │ inheritance         │         RESERVATION             │
             ▼                     ├─────────────────────────────────┤
    ┌────────┴────────┐            │ + idReservation: int            │
-   │   INHERITANCE   │            │ + customer: Customer*           │
+   │   SUBCLASSES    │            │ + customer: Customer*           │
    │                 │            │ + room: Room*                   │
 ┌──┴──┐ ┌────┴────┐ ┌┴────┐       │ + checkInDate: string           │
 │Deluxe│ │Superior│ │Suite│       │ + checkOutDate: string          │
 │Room  │ │Room    │ │Room │       │ + payment: Payment*             │
 └──────┘ └────────┘ └─────┘       ├─────────────────────────────────┤
+                                  │ + Reservation(id, c, r, in, out)│
+                                  │ + ~Reservation()                │
                                   │ + showReservationDetails()      │
                                   │ + cancelReservation()           │
+                                  │ + getPayment(): Payment*        │
                                   └────────────────┬────────────────┘
-                                                   │ has 1
+                                                   │ composition 1
                                                    ▼
                                   ┌─────────────────────────────────┐
                                   │           PAYMENT               │
@@ -134,15 +165,48 @@ Tugas_OOP_Hotel/
                                   │ + totalAmount: double           │
                                   │ + paymentStatus: string         │
                                   ├─────────────────────────────────┤
-                                  │ + calculateTotalAmount()        │
+                                  │ + Payment(id, amount)           │
+                                  │ + Payment(id, Reservation*)     │
+                                  │ + calculateTotalAmount(): double│
                                   │ + confirmPayment()              │
                                   │ + showPaymentDetails()          │
                                   └─────────────────────────────────┘
 ```
 
+### RoomFactory (Factory Pattern)
+
+```
+┌─────────────────────────────────────┐
+│           ROOMFACTORY               │
+├─────────────────────────────────────┤
+│ + static createRoom(id, type): Room*│
+└─────────────────────────────────────┘
+         │
+         │ creates
+         ▼
+    ┌────┴────┐
+    │  Room   │
+    └────┬────┘
+         │
+    ┌────┼────┐
+    ▼    ▼    ▼
+Deluxe Superior Suite
+```
+
 ---
 
-## 🛠️ Instalasi
+## 🔗 Relasi Antarkelas
+
+| Relasi | Kelas | Deskripsi |
+|--------|-------|-----------|
+| **Inheritance** | Room → DeluxeRoom, SuperiorRoom, SuiteRoom | Pewarisan atribut dan method dasar |
+| **Aggregation** | Hotel ◇→ Room | Hotel memiliki kumpulan Room |
+| **Composition** | Reservation ◆→ Payment | Payment tidak ada tanpa Reservation |
+| **Association** | Customer ──→ Reservation | Customer membuat Reservation |
+
+---
+
+## �🛠️ Instalasi
 
 ### Prerequisites
 - **Compiler C++**: g++ (GCC) atau clang++
@@ -194,33 +258,42 @@ g++ -o hotel_program main.cpp Customer.cpp Hotel.cpp Reservation.cpp Room.cpp Pa
 hotel_program.exe
 ```
 
-### Menu Utama
+### Menu Login
 
 ```
 ========================================
        SISTEM RESERVASI HOTEL UGM       
 ========================================
-[1] Tambah Kamar Baru
-[2] Lihat Daftar Kamar
-[3] Tambah Customer Baru
-[4] Lihat Daftar Customer
-[5] Buat Reservasi
-[6] Lihat Daftar Reservasi
-[7] Batalkan Reservasi
-[8] Konfirmasi Pembayaran
+         Silakan Login Sebagai:         
+========================================
+[1] Admin
+[2] Tamu
 [0] Keluar
 ========================================
 Pilihan Anda: _
 ```
 
-### 📝 Contoh Alur Penggunaan
+### 📝 Contoh Alur Penggunaan (Admin)
 
 ```
-1️⃣  Pilih [3] → Tambah customer "Budi Santoso"
-2️⃣  Pilih [5] → Buat reservasi untuk Budi, kamar Suite
-3️⃣  Pilih [6] → Lihat reservasi (Status: Pending)
-4️⃣  Pilih [8] → Konfirmasi pembayaran
-5️⃣  Pilih [6] → Lihat reservasi (Status: Confirmed) ✅
+1️⃣  Login sebagai Admin [1]
+2️⃣  Pilih [3] → Tambah customer "Budi Santoso"
+3️⃣  Pilih [5] → Buat reservasi untuk Budi, kamar Suite
+4️⃣  Pilih [6] → Lihat reservasi (Status: Pending)
+5️⃣  Pilih [8] → Konfirmasi pembayaran
+6️⃣  Pilih [6] → Lihat reservasi (Status: Confirmed) ✅
+7️⃣  Pilih [9] → Logout
+```
+
+### 📝 Contoh Alur Penggunaan (Tamu)
+
+```
+1️⃣  Login sebagai Tamu [2]
+2️⃣  Pilih [1] → Lihat kamar yang tersedia
+3️⃣  Pilih [2] → Daftar sebagai customer
+4️⃣  Pilih [3] → Buat reservasi
+5️⃣  Pilih [4] → Lihat reservasi saya
+6️⃣  Pilih [9] → Logout
 ```
 
 ---
@@ -296,21 +369,78 @@ g++ -o hotel_program main.cpp Customer.cpp Hotel.cpp Reservation.cpp Room.cpp Pa
 ./hotel_program
 
 # Test scenario:
-# 1. Tambah customer
-# 2. Lihat kamar default (101, 102, 103)
-# 3. Buat reservasi
-# 4. Konfirmasi pembayaran
-# 5. Batalkan reservasi
+# 1. Login sebagai Admin
+# 2. Tambah customer
+# 3. Lihat kamar default (101, 102, 103)
+# 4. Buat reservasi
+# 5. Konfirmasi pembayaran
+# 6. Batalkan reservasi
+# 7. Logout dan login sebagai Tamu
 ```
 
 ---
 
-## � Catatan Pengembangan
+## 📋 Daftar Fungsi
+
+### Hotel Class
+| Method | Deskripsi |
+|--------|-----------|
+| `Hotel(name, addr)` | Constructor |
+| `addRoom(Room*)` | Menambah kamar ke hotel |
+| `showRoomList()` | Menampilkan daftar kamar |
+| `showReservationList()` | Menampilkan daftar reservasi |
+| `createReservation(Customer*, Room*, in, out)` | Membuat reservasi baru |
+| `cancelReservationById(int)` | Membatalkan reservasi |
+| `getRoomById(int)` | Mendapatkan kamar berdasarkan ID |
+| `getReservationById(int)` | Mendapatkan reservasi berdasarkan ID |
+
+### Room Class
+| Method | Deskripsi |
+|--------|-----------|
+| `Room(id, type, p, cap)` | Constructor |
+| `virtual ~Room()` | Virtual destructor |
+| `showRoomDetails()` | Menampilkan detail kamar |
+| `changeRoomStatus(newStatus)` | Mengubah status kamar |
+
+### Customer Class
+| Method | Deskripsi |
+|--------|-----------|
+| `Customer(id, n, e, p)` | Constructor |
+| `showCustomerDetails()` | Menampilkan detail customer |
+| `bookRoom(Room*)` | Memilih kamar untuk booking |
+
+### Reservation Class
+| Method | Deskripsi |
+|--------|-----------|
+| `Reservation(id, c, r, in, out)` | Constructor + buat Payment |
+| `~Reservation()` | Destructor + hapus Payment |
+| `showReservationDetails()` | Menampilkan detail reservasi |
+| `cancelReservation()` | Mengubah status kamar ke Available |
+| `getPayment()` | Getter untuk objek Payment |
+
+### Payment Class
+| Method | Deskripsi |
+|--------|-----------|
+| `Payment(id, amount)` | Constructor dengan amount |
+| `Payment(id, Reservation*)` | Constructor dengan Reservation |
+| `calculateTotalAmount()` | Menghitung total pembayaran |
+| `confirmPayment()` | Mengkonfirmasi pembayaran |
+| `showPaymentDetails()` | Menampilkan detail pembayaran |
+
+### RoomFactory Class
+| Method | Deskripsi |
+|--------|-----------|
+| `static createRoom(id, type)` | Factory method untuk membuat Room |
+
+---
+
+## 📝 Catatan Pengembangan
 
 | Versi | Tanggal | Perubahan |
 |-------|---------|-----------|
 | 1.0 | 19 Des 2024 | Initial release dengan fitur dasar |
 | 1.1 | 19 Des 2024 | Tambah class Payment terpisah + konfirmasi pembayaran |
+| 1.2 | 22 Des 2024 | Tambah sistem login Admin/Tamu + menu terpisah per role |
 
 ---
 

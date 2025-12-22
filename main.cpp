@@ -10,23 +10,58 @@ std::vector<Customer*> customerList;
 int nextRoomId = 104;  // Karena sudah ada kamar 101, 102, 103
 int nextCustomerId = 1;
 
+// Role pengguna
+enum UserRole { ADMIN, GUEST };
+UserRole currentRole;
+
 void clearInput() {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void showMenu() {
+void showLoginMenu() {
     std::cout << "\n========================================" << std::endl;
     std::cout << "       SISTEM RESERVASI HOTEL UGM       " << std::endl;
     std::cout << "========================================" << std::endl;
+    std::cout << "         Silakan Login Sebagai:         " << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "[1] Admin" << std::endl;
+    std::cout << "[2] Tamu" << std::endl;
+    std::cout << "[0] Keluar" << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "Pilihan Anda: ";
+}
+
+void showAdminMenu() {
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "     MENU ADMIN - HOTEL UGM             " << std::endl;
+    std::cout << "========================================" << std::endl;
     std::cout << "[1] Tambah Kamar Baru" << std::endl;
     std::cout << "[2] Lihat Daftar Kamar" << std::endl;
-    std::cout << "[3] Tambah Customer Baru" << std::endl;
-    std::cout << "[4] Lihat Daftar Customer" << std::endl;
-    std::cout << "[5] Buat Reservasi" << std::endl;
-    std::cout << "[6] Lihat Daftar Reservasi" << std::endl;
-    std::cout << "[7] Batalkan Reservasi" << std::endl;
-    std::cout << "[8] Konfirmasi Pembayaran" << std::endl;
+    std::cout << "[3] Cek Ketersediaan Kamar" << std::endl;
+    std::cout << "[4] Tambah Customer Baru" << std::endl;
+    std::cout << "[5] Lihat Daftar Customer" << std::endl;
+    std::cout << "[6] Buat Reservasi" << std::endl;
+    std::cout << "[7] Lihat Daftar Reservasi" << std::endl;
+    std::cout << "[8] Batalkan Reservasi" << std::endl;
+    std::cout << "[9] Konfirmasi Pembayaran" << std::endl;
+    std::cout << "[10] Logout" << std::endl;
+    std::cout << "[0] Keluar" << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "Pilihan Anda: ";
+}
+
+void showGuestMenu() {
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "      MENU TAMU - HOTEL UGM             " << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "[1] Lihat Daftar Kamar" << std::endl;
+    std::cout << "[2] Cek Ketersediaan Kamar" << std::endl;
+    std::cout << "[3] Daftar Sebagai Customer" << std::endl;
+    std::cout << "[4] Buat Reservasi" << std::endl;
+    std::cout << "[5] Lihat Reservasi Saya" << std::endl;
+    std::cout << "[6] Batalkan Reservasi" << std::endl;
+    std::cout << "[9] Logout" << std::endl;
     std::cout << "[0] Keluar" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "Pilihan Anda: ";
@@ -100,6 +135,77 @@ void showCustomerListNumbered() {
     for (size_t i = 0; i < customerList.size(); ++i) {
         std::cout << "[" << (i + 1) << "] " << customerList[i]->name 
                   << " (ID: " << customerList[i]->idCustomer << ")" << std::endl;
+    }
+}
+
+void checkRoomAvailabilityMenu(Hotel& hotel) {
+    int roomChoice;
+    int checkInDay, checkInMonth, checkInYear;
+    int checkOutDay, checkOutMonth, checkOutYear;
+    char dateStr[20];
+    std::string checkIn, checkOut;
+    
+    std::cout << "\n+--------------------------------------+" << std::endl;
+    std::cout << "|    CEK KETERSEDIAAN KAMAR            |" << std::endl;
+    std::cout << "+--------------------------------------+" << std::endl;
+    
+    // Tampilkan daftar kamar
+    hotel.showRoomList();
+    
+    std::cout << "\nMasukkan ID Kamar yang ingin dicek: ";
+    std::cin >> roomChoice;
+    
+    Room* room = hotel.getRoomById(roomChoice);
+    if (room == NULL) {
+        std::cout << "Error: Kamar tidak ditemukan!" << std::endl;
+        return;
+    }
+    
+    // Input tanggal check-in
+    std::cout << "\n--- Tanggal Check-In ---" << std::endl;
+    std::cout << "Pilih Tahun:" << std::endl;
+    std::cout << "[1] 2025" << std::endl;
+    std::cout << "[2] 2026" << std::endl;
+    std::cout << "Pilihan: ";
+    std::cin >> checkInYear;
+    checkInYear = (checkInYear == 1) ? 2025 : 2026;
+    
+    std::cout << "Pilih Bulan (1-12): ";
+    std::cin >> checkInMonth;
+    
+    std::cout << "Pilih Tanggal (1-31): ";
+    std::cin >> checkInDay;
+    
+    snprintf(dateStr, sizeof(dateStr), "%d-%02d-%02d", checkInYear, checkInMonth, checkInDay);
+    checkIn = dateStr;
+    
+    // Input tanggal check-out
+    std::cout << "\n--- Tanggal Check-Out ---" << std::endl;
+    std::cout << "Pilih Tahun:" << std::endl;
+    std::cout << "[1] 2025" << std::endl;
+    std::cout << "[2] 2026" << std::endl;
+    std::cout << "Pilihan: ";
+    std::cin >> checkOutYear;
+    checkOutYear = (checkOutYear == 1) ? 2025 : 2026;
+    
+    std::cout << "Pilih Bulan (1-12): ";
+    std::cin >> checkOutMonth;
+    
+    std::cout << "Pilih Tanggal (1-31): ";
+    std::cin >> checkOutDay;
+    
+    snprintf(dateStr, sizeof(dateStr), "%d-%02d-%02d", checkOutYear, checkOutMonth, checkOutDay);
+    checkOut = dateStr;
+    
+    // Cek ketersediaan
+    std::cout << "\n--- Hasil Pengecekan ---" << std::endl;
+    std::cout << "Kamar   : " << room->idRoom << " (" << room->roomType << ")" << std::endl;
+    std::cout << "Periode : " << checkIn << " s/d " << checkOut << std::endl;
+    
+    if (hotel.isRoomAvailable(room, checkIn, checkOut)) {
+        std::cout << "Status  : ✓ TERSEDIA" << std::endl;
+    } else {
+        std::cout << "Status  : ✗ TIDAK TERSEDIA (sudah ada reservasi pada tanggal tersebut)" << std::endl;
     }
 }
 
@@ -278,7 +384,8 @@ void confirmPaymentMenu(Hotel& hotel) {
 
 int main() {
     Hotel myHotel("UGM Hotel", "Yogyakarta");
-    int choice;
+    int loginChoice, choice;
+    bool isRunning = true;
     
     // Setup data awal (3 kamar default)
     myHotel.addRoom(RoomFactory::createRoom(101, "Deluxe"));
@@ -290,45 +397,126 @@ int main() {
     std::cout << "    Alamat: " << myHotel.hotelAddress << std::endl;
     std::cout << "========================================" << std::endl;
     
-    do {
-        showMenu();
-        std::cin >> choice;
+    // Main login loop
+    while (isRunning) {
+        showLoginMenu();
+        std::cin >> loginChoice;
         
-        switch (choice) {
-            case 1:
-                addRoom(myHotel);
+        switch (loginChoice) {
+            case 1: {
+                // Login sebagai Admin
+                currentRole = ADMIN;
+                std::cout << "\n>> Login sebagai ADMIN berhasil!" << std::endl;
+                
+                bool adminSession = true;
+                while (adminSession) {
+                    showAdminMenu();
+                    std::cin >> choice;
+                    
+                    switch (choice) {
+                        case 1:
+                            addRoom(myHotel);
+                            break;
+                        case 2:
+                            myHotel.showRoomList();
+                            break;
+                        case 3:
+                            checkRoomAvailabilityMenu(myHotel);
+                            break;
+                        case 4:
+                            addCustomer();
+                            break;
+                        case 5:
+                            showCustomerListNumbered();
+                            break;
+                        case 6:
+                            createReservationMenu(myHotel);
+                            break;
+                        case 7:
+                            myHotel.showReservationList();
+                            break;
+                        case 8:
+                            cancelReservationMenu(myHotel);
+                            break;
+                        case 9:
+                            confirmPaymentMenu(myHotel);
+                            break;
+                        case 10:
+                            std::cout << "\n>> Logout dari Admin..." << std::endl;
+                            adminSession = false;
+                            break;
+                        case 0:
+                            std::cout << "\n========================================" << std::endl;
+                            std::cout << "  Terima kasih telah menggunakan sistem" << std::endl;
+                            std::cout << "      reservasi " << myHotel.hotelName << "!" << std::endl;
+                            std::cout << "========================================" << std::endl;
+                            adminSession = false;
+                            isRunning = false;
+                            break;
+                        default:
+                            std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-10." << std::endl;
+                    }
+                }
                 break;
-            case 2:
-                myHotel.showRoomList();
+            }
+            case 2: {
+                // Login sebagai Tamu
+                currentRole = GUEST;
+                std::cout << "\n>> Login sebagai TAMU berhasil!" << std::endl;
+                
+                bool guestSession = true;
+                while (guestSession) {
+                    showGuestMenu();
+                    std::cin >> choice;
+                    
+                    switch (choice) {
+                        case 1:
+                            myHotel.showRoomList();
+                            break;
+                        case 2:
+                            checkRoomAvailabilityMenu(myHotel);
+                            break;
+                        case 3:
+                            addCustomer();
+                            break;
+                        case 4:
+                            createReservationMenu(myHotel);
+                            break;
+                        case 5:
+                            myHotel.showReservationList();
+                            break;
+                        case 6:
+                            cancelReservationMenu(myHotel);
+                            break;
+                        case 9:
+                            std::cout << "\n>> Logout dari Tamu..." << std::endl;
+                            guestSession = false;
+                            break;
+                        case 0:
+                            std::cout << "\n========================================" << std::endl;
+                            std::cout << "  Terima kasih telah menggunakan sistem" << std::endl;
+                            std::cout << "      reservasi " << myHotel.hotelName << "!" << std::endl;
+                            std::cout << "========================================" << std::endl;
+                            guestSession = false;
+                            isRunning = false;
+                            break;
+                        default:
+                            std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-6 atau 9." << std::endl;
+                    }
+                }
                 break;
-            case 3:
-                addCustomer();
-                break;
-            case 4:
-                showCustomerListNumbered();
-                break;
-            case 5:
-                createReservationMenu(myHotel);
-                break;
-            case 6:
-                myHotel.showReservationList();
-                break;
-            case 7:
-                cancelReservationMenu(myHotel);
-                break;
-            case 8:
-                confirmPaymentMenu(myHotel);
-                break;
+            }
             case 0:
                 std::cout << "\n========================================" << std::endl;
                 std::cout << "  Terima kasih telah menggunakan sistem" << std::endl;
                 std::cout << "      reservasi " << myHotel.hotelName << "!" << std::endl;
                 std::cout << "========================================" << std::endl;
+                isRunning = false;
                 break;
             default:
-                std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-8." << std::endl;
+                std::cout << "\n>> Pilihan tidak valid. Silakan pilih 0-2." << std::endl;
         }
-    } while (choice != 0);
+    }
     
     // Cleanup memory
     for (size_t i = 0; i < customerList.size(); ++i) {

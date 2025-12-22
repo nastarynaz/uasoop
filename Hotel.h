@@ -9,6 +9,7 @@ class Hotel {
 private:
     std::vector<Room*> roomList;
     std::vector<Reservation*> reservationList;
+    int nextReservationId;  // Counter untuk ID reservasi yang unik
 public:
     std::string hotelName;
     std::string hotelAddress;
@@ -17,9 +18,10 @@ public:
     void addRoom(Room* r);
     void showRoomList();
     void showReservationList();
+    bool isRoomAvailable(Room* r, std::string checkIn, std::string checkOut);
     void createReservation(Customer* c, Room* r, std::string in, std::string out);
     void cancelReservationById(int id);
     Room* getRoomById(int id);
-    Reservation* getReservationById(int id);  // Method baru untuk akses reservasi
+    Reservation* getReservationById(int id);
 };
 #endif

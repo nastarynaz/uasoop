@@ -7,12 +7,12 @@
 
 class Reservation {
 public:
+    Payment* payment;
     int idReservation;
     Customer* customer;
     Room* room;
     std::string checkInDate;
     std::string checkOutDate;
-    Payment* payment;
 
     Reservation(int id, Customer* c, Room* r, std::string in, std::string out);
     ~Reservation();
